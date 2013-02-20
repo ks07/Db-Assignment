@@ -2,16 +2,16 @@ public class Record {
     private final String[] fields;
 
     public Record(String[] values) {
-        // Copy the provided array so that it cannot be modified externally.
-        fields = new String[values.length];
-        System.arraycopy(values, 0, fields, 0, values.length);
-
         // Check that no array elements are null.
-        for (String s : fields) {
+        for (String s : values) {
             if (s == null) {
                 throw new Error("Attempted to store a null value.");
             }
         }
+
+        // Copy the provided array so that it cannot be modified externally.
+        fields = new String[values.length];
+        System.arraycopy(values, 0, fields, 0, values.length);
     }
 
     private boolean checkBounds(int col) {
