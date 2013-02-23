@@ -1,27 +1,89 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Table {
     private final String name;
     private final String[] columns;
-    private final ArrayList<Record> records = new ArrayList<Record>();
-
-    // Works mostly, but not particularly efficient.
-    // Matches any comma, provided it is not escaped with a backslash, that
-    // is not escaped itself. Hit trouble with many chained '\'.
-    private static final String delimRegex = "(?<!(?<!\\\\)\\\\),";
+    private final ArrayList<Record> records;
 
     public Table(String name) {
+        this.name = name;
+
         try {
+            ArrayList<Record> rec = new ArrayList<Record>();
             File inFile = new File(name + ".txt");
-            Scanner in = new Scanner(inFile, "UTF-8");
-            in.useDelimiter(delimRegex);
-            
+            BufferedReader in = new BufferedReader(new FileReader(inFile));
+            String[] line = readNext(in);
+
+            if (line != null) {
+                // First line gives the column names.
+                this.columns = line;
+            } else {
+                throw new Error("Table file empty.");
+            }
+
+            for (line = readNext(in); line != null; line = readNext(in)) {
+                if (line.length == this.columns.length) {
+                    rec.add(new Record(line));
+                } else {
+                    throw new Error("Table file invalid.");
+                }
+            }
+
+            this.records = rec;
         } catch (IOException ioe) {
             throw new Error("Could not read table file.", ioe);
         }
     }
 
+    // Reads the next record from the given BufferedReader as an array of Strings.
+    // Returns null if there are no more lines.
+    private static String[] readNext(BufferedReader in) throws IOException {
+        ArrayList<String> ret = new ArrayList<String>();
+        StringBuilder sb = new StringBuilder();
+        int read = in.read();
+        boolean isEscaped = false;
+        char c;
+
+        while (read >= 0) {
+            c = (char)read;
+
+            if (isEscaped && (c == '\\' || c == '\n' || c == ',')) {
+                if (c == '\\' || c == '\n' || c == ',') {
+                    // Met a valid escape sequence, append.
+                    sb.append(c);
+                } else {
+                    // Found an invalid escape sequence (e.g. \a).
+                    throw new Error("Table file invalid.");
+                }
+            } else if (c == '\\') {
+                // Met an escape character, ignore and set state.
+                isEscaped = true;
+            } else if (c == ',') {
+                // Met a field delimiter, add to the list.
+                ret.add(sb.toString());
+            } else if (c == '\n') {
+                // Met a record delimiter, add & return the array.
+                ret.add(sb.toString());
+                return ret.toArray(new String[ret.size()]);
+            } else {
+                // Found a regular character, append.
+                sb.append(c);
+            }
+
+            read = in.read();
+        }
+
+        // Table files should always end with a record delimiter.
+        // Return null if we get to EOF.
+        return null;
+    }
+
     public Table(String name, String[] columns) {
+        this.records = new ArrayList<Record>();
         this.name = name;
 
         for (String s : columns) {
@@ -126,5 +188,8 @@ public class Table {
         if (!"beta".equals(t.name(1))) {
             throw new Error("Column name incorrect.");
         }
+
+        // Test loading of the people.txt file.
+        t = new Table("people");
     }
 }
