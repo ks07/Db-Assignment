@@ -11,6 +11,19 @@ public class Table {
     private final String[] columns;
     private final ArrayList<Record> records;
 
+    public Table(String name, String[] columns) {
+        this.records = new ArrayList<Record>();
+        this.name = name;
+
+        for (String s : columns) {
+            if (s == null) {
+                throw new Error("Attempted to store a null value.");
+            }
+        }
+
+        this.columns = new String[columns.length];
+        System.arraycopy(columns, 0, this.columns, 0, columns.length);
+    }
     public Table(String name) {
         this.name = name;
 
@@ -84,8 +97,7 @@ public class Table {
             read = in.read();
         }
 
-        // Table files should always end with a record delimiter.
-        // Return null if we get to EOF.
+        // Return null if we get to EOF without a newline.
         return null;
     }
 
@@ -126,20 +138,6 @@ public class Table {
         ret = ret.replace(",", "\\,");
 
         return ret; 
-    }
-
-    public Table(String name, String[] columns) {
-        this.records = new ArrayList<Record>();
-        this.name = name;
-
-        for (String s : columns) {
-            if (s == null) {
-                throw new Error("Attempted to store a null value.");
-            }
-        }
-
-        this.columns = new String[columns.length];
-        System.arraycopy(columns, 0, this.columns, 0, columns.length);
     }
 
     public String name() {
