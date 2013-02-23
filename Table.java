@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class Table {
@@ -227,6 +228,63 @@ public class Table {
         return col >= 0 && col < header.fields();
     }
 
+    public void print(PrintStream out) {
+        int[] widths = getColWidths();
+
+        for (int col = 0; col < widths.length - 1; col++) {
+            padPrint(out, header.field(col), widths[col]);
+        }
+        out.println(header.field(widths.length - 1));
+
+        for (int col = 0; col < widths.length - 1; col++) {
+            printMult(out, '-', widths[col]);
+            out.print("+-");
+        }
+        printMult(out, '-', widths[widths.length - 1] - 1);
+        out.println();
+
+        for (Record r : records) {
+            for (int col = 0; col < widths.length - 1; col++) {
+                padPrint(out, r.field(col), widths[col]);
+            }
+            out.println(r.field(widths.length - 1));
+        }
+    }
+
+    private void padPrint(PrintStream out, String val, int len) {
+        out.print(val);
+        printMult(out, ' ', len - val.length());
+        out.print("| ");
+    }
+
+    private void printMult(PrintStream out, char c, int len) {
+        for (; len >= 0; len--) {
+            out.print(c);
+        }
+    }
+
+    private int[] getColWidths() {
+        int[] widths = new int[header.fields()];
+
+        for (int col = 0; checkColBounds(col); col++) {
+            widths[col] = getColWidth(col);
+        }
+
+        return widths;
+    }
+
+    private int getColWidth(int col) {
+        int width = header.field(col).length();
+
+        for (Record r : records) {
+            if (r.field(col).length() > width) {
+                width = r.field(col).length();
+            }
+        }
+
+        return width;
+    }
+
     public static void main(String[] args) {
         String[] cols = {
             "alpha",
@@ -255,8 +313,11 @@ public class Table {
         if (!"test".equals(t.name())) {
             throw new Error("Name incorrect.");
         }
-        if (!"Beta\nNewline".equals(t.name(1))) {
+        if (!cols[1].equals(t.name(1))) {
             throw new Error("Column name incorrect.");
         }
+
+        t = new Table("people");
+        t.print(System.out);
     }
 }
