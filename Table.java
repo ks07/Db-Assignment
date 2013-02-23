@@ -5,6 +5,22 @@ public class Table {
     private final String[] columns;
     private final ArrayList<Record> records = new ArrayList<Record>();
 
+    // Works mostly, but not particularly efficient.
+    // Matches any comma, provided it is not escaped with a backslash, that
+    // is not escaped itself. Hit trouble with many chained '\'.
+    private static final String delimRegex = "(?<!(?<!\\\\)\\\\),";
+
+    public Table(String name) {
+        try {
+            File inFile = new File(name + ".txt");
+            Scanner in = new Scanner(inFile, "UTF-8");
+            in.useDelimiter(delimRegex);
+            
+        } catch (IOException ioe) {
+            throw new Error("Could not read table file.", ioe);
+        }
+    }
+
     public Table(String name, String[] columns) {
         this.name = name;
 
