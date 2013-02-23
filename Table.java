@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Table {
@@ -80,6 +83,32 @@ public class Table {
         // Table files should always end with a record delimiter.
         // Return null if we get to EOF.
         return null;
+    }
+
+    public void store() {
+        try {
+            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(this.name + ".txt")));
+
+            for (int col = 0; col < this.columns.length - 1; col++) {
+                out.print(columns[col]);
+                out.print(',');
+            }
+            out.print(columns[columns.length - 1]);
+            out.print('\n');
+
+            for (Record r : this.records) {
+                for (int f = 0; f < r.fields() - 1; f++) {
+                    out.print(r.field(f));
+                    out.print(',');
+                }
+                out.print(r.field(r.fields() - 1));
+                out.print('\n');
+            }
+
+            out.close();
+        } catch (IOException ioe) {
+            throw new Error("Failed to write table file.", ioe);
+        }
     }
 
     public Table(String name, String[] columns) {
@@ -177,19 +206,23 @@ public class Table {
             "gamma"
         };
 
-        Table t = new Table("table", cols);
+        Table t = new Table("test", cols);
+        t.insert(new Record(new String[] {"a", "b", "c"}));
+        t.insert(new Record(new String[] {"1", "2", "3"}));
 
         if (t.columns() != cols.length) {
             throw new Error("Columns incorrect.");
         }
-        if (!"table".equals(t.name())) {
+        if (!"test".equals(t.name())) {
             throw new Error("Name incorrect.");
         }
         if (!"beta".equals(t.name(1))) {
             throw new Error("Column name incorrect.");
         }
+        // Store in a file.
+        t.store();
 
-        // Test loading of the people.txt file.
-        t = new Table("people");
+        // Test loading of the file.
+        t = new Table("test");
     }
 }
