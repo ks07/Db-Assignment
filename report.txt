@@ -1,0 +1,36 @@
+====================
+The Database Program
+====================
+
+by George Field (gf12815) & Alistair Wick (aw12700)
+
+Analysis
+==========
+The program is used as a component of another to store and retrieve records in a single database table. Records added to a table are a collection of Strings. Empty strings are allowed, but the number of fields in a record must always match the number of columns. A table must contain at least one column.
+
+Design
+==========
+The program can be split into two components, Table and Record. The Record class will simply wrap an array of Strings, and provide public methods to allow access to the data it contains. The table class will use an ArrayList to store a collection of these Record objects, as well as headers describing each field found in the records. Methods will be added to allow access to get the names of these columns, as well as methods that will allow adding and removing records from the table.
+
+Access to stored records will be index based, with the indexes generated sequentially as rows are inserted. Rows are deleted by passing the row object to be removed to the delete method. The Table will then search the list of records for the given object using reference equality, and once found will remove it's reference from the list.
+
+The Table class will provide an alternative constructor that allows loading from a text file created by the program in the current working directory. This file will essentially be a CSV file, though a malformed file will cause an error and prevent the program from loading, so it is not expected to be edited by the user. Our format will have to support literal characters that are used as delimiters, i.e. comma and newline. Therefore, we will use backslash to escape these characters, and allow chains of backslashes to represent them.
+
+Implementation
+==========
+The program will use Java, and use a class to represent a Record, and another to represent a Table. The record class will have a private field to store the String array, and will provide public methods that allow modifying and accessing elements within the array. The array will be copied when the record is created so that it cannot be modified without using the methods provided by Record.
+
+The Table class will store the records that form the table. Programs using this database will create a Record object, then insert into the Table uisng the insert method. The record will be checked at this point that it matches the format of the Table it is being added to. The user can then later access all rows in the table using the select method, and modify the returned record to update it in the table. Once a record has been retrieved with select, it is possible to remove it from the table with the delete method.
+
+Tests
+==========
+We tested cases covering the following possibilities:
+
+* Mismatching records inserting into tables.
+* Null fields and records being provided.
+* Inserting the same record multiple times.
+* Saving and loading a table to a file containing characters that must be escaped.
+
+Deployment
+==========
+The program should be included as part of another, larger program to act as a storage backend.
