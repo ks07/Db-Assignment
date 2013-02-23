@@ -2,6 +2,11 @@ public class Record {
     private final String[] fields;
 
     public Record(String[] values) {
+        // Check that the array is valid
+        if (values == null) {
+            throw new Error("Attempted to store a null value.");
+        }
+
         // Check that no array elements are null.
         for (String s : values) {
             if (s == null) {
@@ -45,11 +50,11 @@ public class Record {
     public static void main(String[] args) {
         // Do some tests.
         String[] values = {
-            "alpha",
-            "beta",
-            "gamma",
-            "delta",
-            "epsilon"
+                "alpha",
+                "beta",
+                "gamma",
+                "delta",
+                "epsilon"
         };
 
         Record r = new Record(values);

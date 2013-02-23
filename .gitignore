@@ -1,6 +1,8 @@
 *~
 *.class
 *.txt
+*.classpath
+*.project
 
 # Package Files #
 *.jar

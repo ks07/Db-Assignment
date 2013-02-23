@@ -8,47 +8,37 @@ import java.util.ArrayList;
 
 public class Table {
     private final String name;
-    private final String[] columns;
+    private final Record header;
     private final ArrayList<Record> records;
 
     public Table(String name, String[] columns) {
-        this.records = new ArrayList<Record>();
+        records = new ArrayList<Record>();
         this.name = name;
-
-        for (String s : columns) {
-            if (s == null) {
-                throw new Error("Attempted to store a null value.");
-            }
-        }
-
-        this.columns = new String[columns.length];
-        System.arraycopy(columns, 0, this.columns, 0, columns.length);
+        header = new Record(columns);
     }
     public Table(String name) {
+        records = new ArrayList<Record>();
         this.name = name;
 
         try {
-            ArrayList<Record> rec = new ArrayList<Record>();
             File inFile = new File(name + ".txt");
             BufferedReader in = new BufferedReader(new FileReader(inFile));
             String[] line = readNext(in);
 
             if (line != null) {
                 // First line gives the column names.
-                this.columns = line;
+                header = new Record(line);
             } else {
                 throw new Error("Table file empty.");
             }
 
             for (line = readNext(in); line != null; line = readNext(in)) {
-                if (line.length == this.columns.length) {
-                    rec.add(new Record(line));
+                if (line.length == header.fields()) {
+                    records.add(new Record(line));
                 } else {
                     throw new Error("Table file invalid.");
                 }
             }
-
-            this.records = rec;
         } catch (IOException ioe) {
             throw new Error("Could not read table file.", ioe);
         }
@@ -105,19 +95,24 @@ public class Table {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(this.name + ".txt"));
 
-            for (int col = 0; col < this.columns.length - 1; col++) {
-                out.write(escapeChars(columns[col]));
+            String s;
+            for (int col = 0; col < header.fields() - 1; col++) {
+                s = header.field(col);
+                out.write(escapeChars(s));
                 out.write(',');
             }
-            out.write(escapeChars(columns[columns.length - 1]));
+            s = header.field(header.fields() - 1);
+            out.write(escapeChars(s));
             out.write('\n');
 
             for (Record r : this.records) {
                 for (int f = 0; f < r.fields() - 1; f++) {
-                    out.write(escapeChars(r.field(f)));
+                    s = r.field(f);
+                    out.write(escapeChars(s));
                     out.write(',');
                 }
-                out.write(escapeChars(r.field(r.fields() - 1)));
+                s = r.field(r.fields() - 1);
+                out.write(escapeChars(s));
                 out.write('\n');
             }
 
@@ -149,20 +144,20 @@ public class Table {
     }
 
     public int columns() {
-        return columns.length;
+        return header.fields();
     }
 
     public String name(int col) {
         if (checkColBounds(col)) {
-            return columns[col];
+            return header.field(col);
         } else {
             throw new Error("Bad column.");
         }
     }
 
     public int column(String name) {
-        for (int col = 0; col < columns.length; col++) {
-            if (columns[col].equalsIgnoreCase(name)) {
+        for (int col = 0; col < header.fields(); col++) {
+            if (header.field(col).equalsIgnoreCase(name)) {
                 return col;
             }
         }
@@ -211,7 +206,7 @@ public class Table {
     }
 
     private boolean checkColBounds(int col) {
-        return col >= 0 && col < columns.length;
+        return col >= 0 && col < header.fields();
     }
 
     public static void main(String[] args) {
