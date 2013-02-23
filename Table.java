@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 
 public class Table {
     private final String name;
@@ -93,22 +91,22 @@ public class Table {
 
     public void store() {
         try {
-            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(this.name + ".txt")));
+            BufferedWriter out = new BufferedWriter(new FileWriter(this.name + ".txt"));
 
             for (int col = 0; col < this.columns.length - 1; col++) {
-                out.print(escapeChars(columns[col]));
-                out.print(',');
+                out.write(escapeChars(columns[col]));
+                out.write(',');
             }
-            out.print(escapeChars(columns[columns.length - 1]));
-            out.print('\n');
+            out.write(escapeChars(columns[columns.length - 1]));
+            out.write('\n');
 
             for (Record r : this.records) {
                 for (int f = 0; f < r.fields() - 1; f++) {
-                    out.print(escapeChars(r.field(f)));
-                    out.print(',');
+                    out.write(escapeChars(r.field(f)));
+                    out.write(',');
                 }
-                out.print(escapeChars(r.field(r.fields() - 1)));
-                out.print('\n');
+                out.write(escapeChars(r.field(r.fields() - 1)));
+                out.write('\n');
             }
 
             out.close();
