@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 
 public class Table {
     private final String name;
@@ -54,20 +55,25 @@ public class Table {
         while (read >= 0) {
             c = (char)read;
 
-            if (isEscaped && (c == '\\' || c == '\n' || c == ',')) {
-                if (c == '\\' || c == '\n' || c == ',') {
+            if (isEscaped) {
+                if (c == ',' || c == '\\' || c == '\n') {
                     // Met a valid escape sequence, append.
                     sb.append(c);
                 } else {
                     // Found an invalid escape sequence (e.g. \a).
                     throw new Error("Table file invalid.");
                 }
+
+                isEscaped = false;
             } else if (c == '\\') {
                 // Met an escape character, ignore and set state.
                 isEscaped = true;
             } else if (c == ',') {
                 // Met a field delimiter, add to the list.
                 ret.add(sb.toString());
+
+                // Reset the StringBuilder.
+                sb = new StringBuilder();
             } else if (c == '\n') {
                 // Met a record delimiter, add & return the array.
                 ret.add(sb.toString());
@@ -90,18 +96,18 @@ public class Table {
             PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(this.name + ".txt")));
 
             for (int col = 0; col < this.columns.length - 1; col++) {
-                out.print(columns[col]);
+                out.print(escapeChars(columns[col]));
                 out.print(',');
             }
-            out.print(columns[columns.length - 1]);
+            out.print(escapeChars(columns[columns.length - 1]));
             out.print('\n');
 
             for (Record r : this.records) {
                 for (int f = 0; f < r.fields() - 1; f++) {
-                    out.print(r.field(f));
+                    out.print(escapeChars(r.field(f)));
                     out.print(',');
                 }
-                out.print(r.field(r.fields() - 1));
+                out.print(escapeChars(r.field(r.fields() - 1)));
                 out.print('\n');
             }
 
@@ -109,6 +115,19 @@ public class Table {
         } catch (IOException ioe) {
             throw new Error("Failed to write table file.", ioe);
         }
+    }
+
+    private static String escapeChars(String field) {
+        String ret = field;
+
+        // Replace all single \ with double \\.
+        ret = ret.replace("\\", "\\\\");
+
+        // Preceed all newlines and commas with a \.
+        ret = ret.replace("\n", "\\\n");
+        ret = ret.replace(",", "\\,");
+
+        return ret; 
     }
 
     public Table(String name, String[] columns) {
@@ -202,13 +221,20 @@ public class Table {
     public static void main(String[] args) {
         String[] cols = {
             "alpha",
-            "beta",
+            "Beta\nNewline",
             "gamma"
         };
 
         Table t = new Table("test", cols);
         t.insert(new Record(new String[] {"a", "b", "c"}));
+        t.insert(new Record(new String[] {"ab\ncd", "ef\\gh", "ij,kl"}));
         t.insert(new Record(new String[] {"1", "2", "3"}));
+
+        // Store in a file.
+        t.store();
+
+        // Test loading of the file.
+        t = new Table("test");
 
         if (t.columns() != cols.length) {
             throw new Error("Columns incorrect.");
@@ -216,13 +242,9 @@ public class Table {
         if (!"test".equals(t.name())) {
             throw new Error("Name incorrect.");
         }
-        if (!"beta".equals(t.name(1))) {
+        if (!"Beta\nNewline".equals(t.name(1))) {
             throw new Error("Column name incorrect.");
         }
-        // Store in a file.
-        t.store();
 
-        // Test loading of the file.
-        t = new Table("test");
     }
 }
