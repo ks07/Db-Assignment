@@ -14,7 +14,7 @@ public class Table {
     public Table(String name, String[] columns) {
         records = new ArrayList<Record>();
         this.name = name;
-        header = new Record(columns);
+        header = new Record(this, columns);
     }
     public Table(String name) {
         records = new ArrayList<Record>();
@@ -27,14 +27,14 @@ public class Table {
 
             if (line != null) {
                 // First line gives the column names.
-                header = new Record(line);
+                header = new Record(this, line);
             } else {
                 throw new Error("Table file empty.");
             }
 
             for (line = readNext(in); line != null; line = readNext(in)) {
                 if (line.length == header.fields()) {
-                    records.add(new Record(line));
+                    new Record(this, line);
                 } else {
                     throw new Error("Table file invalid.");
                 }
@@ -144,7 +144,11 @@ public class Table {
     }
 
     public int columns() {
-        return header.fields();
+        if (header == null) {
+            return 0;
+        } else {
+            return header.fields();
+        }
     }
 
     public String name(int col) {
@@ -172,9 +176,23 @@ public class Table {
             throw new Error("Bad row.");
         }
     }
+    
+    public Record select(String key) {
+        for (int i = 0; i < records.size(); i++) {
+            Record r = records.get(i);
+            if (r.key().equals(key)) {
+                return r;
+            }
+        }
+        
+        return null;
+    }
 
     public void insert(Record r) {
-        if (find(r) < 0) {
+        // Do nothing if there's no header
+        if (header == null) {
+            return;
+        } else if (find(r) < 0) {
             records.add(r);
         } else {
             throw new Error("Inserting duplicate record.");
@@ -217,9 +235,13 @@ public class Table {
         };
 
         Table t = new Table("test", cols);
-        t.insert(new Record(new String[] {"a", "b", "c"}));
-        t.insert(new Record(new String[] {"ab\ncd", "ef\\gh", "ij,kl"}));
-        t.insert(new Record(new String[] {"1", "2", "3"}));
+        new Record(t, new String[] {"a", "b", "c"});
+        new Record(t, new String[] {"ab\ncd", "ef\\gh", "ij,kl"});
+        new Record(t, new String[] {"1", "2", "3"});
+        
+        if (!"2".equals(t.select("1").field(1))) {
+            throw new Error("Key incorrect");
+        }
 
         // Store in a file.
         t.store();
@@ -236,6 +258,5 @@ public class Table {
         if (!"Beta\nNewline".equals(t.name(1))) {
             throw new Error("Column name incorrect.");
         }
-
     }
 }
