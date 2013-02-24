@@ -5,15 +5,15 @@ import java.util.regex.Matcher;
 
 public class Type {
     // Map database and names to type objects. Ref will need an object per db and table.
-    private static HashMap<TypeKey, Type> typeCache = new HashMap<TypeKey, Type>();
-    
-    private final TYPE type;
-    private final HashSet<String> tags;
-    private final Table ref;
+    private static final HashMap<TypeKey, Type> typeCache = new HashMap<TypeKey, Type>();
 
     // One or more strings not containing ',' separated with ,
     private static final Pattern TAGPAT = Pattern.compile("[^,]+(,[^,]+)*");
     private static final Pattern INTPAT = Pattern.compile("-?[0-9]+");
+
+    private final TYPE type;
+    private final HashSet<String> tags;
+    private final Table ref;
 
     // Private constructor for internal use
     private Type(TYPE type, String[] tags, Table ref) {
@@ -34,7 +34,7 @@ public class Type {
 
         this.ref = ref;
     }
-    
+
     public boolean allowed(String value) {
         switch (type) {
         case STR:
@@ -49,7 +49,7 @@ public class Type {
 
         throw new Error("Could not check value against type.");
     }
-    
+
     public static Type type(Database db, String name) {
         TYPE parsed = parseName(name);
         TypeKey key = new TypeKey(db, parsed, name);
@@ -64,7 +64,7 @@ public class Type {
                 break;
             case REF:
                 Table ref = db.table(name.substring(4, name.length() - 1));
-                
+
                 if (ref != null) {
                     ret = new Type(parsed, null, ref);
                 } else {
@@ -105,7 +105,7 @@ public class Type {
 
         throw new Error("Invalid type name.");
     }
-    
+
     public static void main(String[] args) {
         Database db = new Database();
         Type str0 = type(db, "string");
