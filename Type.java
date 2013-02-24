@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -7,7 +8,7 @@ public class Type {
     private static HashMap<TypeKey, Type> typeCache = new HashMap<TypeKey, Type>();
     
     private final TYPE type;
-    private final String[] tags;
+    private final HashSet<String> tags;
     private final Table ref;
 
     // One or more strings not containing ',' separated with ,
@@ -17,7 +18,20 @@ public class Type {
     // Private constructor for internal use
     private Type(TYPE type, String[] tags, Table ref) {
         this.type = type;
-        this.tags = tags;
+
+        if (tags != null) {
+            this.tags = new HashSet<String>();
+
+            for (String tag : tags) {
+                // Add returns false if the element already exists.
+                if (!this.tags.add(tag)) {
+                    throw new Error("Duplicate tag.");
+                }
+            }
+        } else {
+            this.tags = null;
+        }
+
         this.ref = ref;
     }
     
@@ -28,22 +42,12 @@ public class Type {
         case INT:
             return INTPAT.matcher(value).matches();
         case TAG:
-            return strArrayContains(tags, value);
+            return tags.contains(value);
         case REF:
             return ref.select(value) != null;
         }
 
         throw new Error("Could not check value against type.");
-    }
-
-    private static boolean strArrayContains(String[] arr, String val) {
-        for (String s : arr) {
-            if (s.equals(val)) {
-                return true;
-            }
-        }
-
-        return false;
     }
     
     public static Type type(Database db, String name) {
@@ -104,21 +108,33 @@ public class Type {
     
     public static void main(String[] args) {
         Database db = new Database();
-        type(db, "string");
-        type(db, "integer");
-        type(db, "ref(people)");
+        Type str0 = type(db, "string");
+        Type int0 =  type(db, "integer");
+        Type ref0 = type(db, "ref(people)");
         Type tag0 = type(db, "tag(yes,no)");
         Type tag1 = type(db, "tag(yes,no)");
 
         if (tag0 != tag1) {
             throw new Error("Did not retrieve tag from cache.");
         }
-
         if (!tag0.allowed("yes")) {
             throw new Error("Tag allowed failed.");
         }
         if (tag0.allowed("maybe")) {
             throw new Error("Invalid tag accepted.");
+        }
+
+        boolean dupErr = true;
+
+        try {
+            // This should cause an error.
+            Type dup0 = type(db, "tag(yes,no,maybe,yes)");
+            dupErr = false;
+        } catch (Error e) {
+        }
+
+        if (!dupErr) {
+            throw new Error("Duplicate tags accepted.");
         }
     }
 
