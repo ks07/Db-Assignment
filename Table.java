@@ -20,6 +20,7 @@ public class Table {
         parent = db;
         parent.addTable(this);
     }
+
     public Table(Database db, String name) {
         records = new ArrayList<Record>();
         this.name = name;

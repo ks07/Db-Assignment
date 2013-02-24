@@ -22,7 +22,7 @@ public class Database {
     }
 
     // Internal method for use by table constructors
-    protected void addTable(Table t) {
+    void addTable(Table t) {
         tables.put(t.name(), t);
     }
 

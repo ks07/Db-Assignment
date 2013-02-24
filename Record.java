@@ -1,6 +1,6 @@
 public class Record {
     private String[] fields;
-    private Table parent;
+    private final Table parent;
 
     public Record(Table table, String key) {
         // Check the key isn't in use
@@ -28,6 +28,7 @@ public class Record {
         
         parent = table;
     }
+
     public Record(Table table, String[] values) {
         // Check that the array is valid
         if (values == null) {
