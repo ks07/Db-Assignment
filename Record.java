@@ -1,8 +1,6 @@
 public class Record {
-    private final String[] fields;
+    private String[] fields;
     private Table parent;
-    
-    private static long nextKey = 0;
 
     public Record(Table table, String key) {
         // Check the key isn't in use
@@ -114,6 +112,19 @@ public class Record {
             throw new Error("Bad column.");
         }
     }
+    
+    public void delete() {
+        if (fields == null) {
+            throw new Error("Record has already been deleted.");
+        }
+        
+        if (parent.select(key()) != null) {
+            fields = null;
+            parent.delete(this);
+        } else {
+            throw new Error("Attempted to delete header.");
+        }
+    }
 
     public static void main(String[] args) {
         // Do some tests.
@@ -148,6 +159,42 @@ public class Record {
         r.field(0, "apple");
         if (!"apple".equals(r.field(0))) {
             throw new Error("Field set failed.");
+        }
+        
+        t.print(System.out);
+        
+        if (!t.select("apple").equals(r)) {
+            throw new Error("Record not in table.");
+        }
+        
+        r.delete();
+        if (t.select("apple") != null) {
+            throw new Error("Deleted record still in table.");
+        }
+        
+        Record r1 = new Record(t, values);
+        r1.field(0, "apple");
+        Record r2 = new Record(t, values);
+        r2.field(0, "endothermic");
+        Record r3 = new Record(t, values);
+        r3.field(0, "To Kill a Mockingbird");
+        
+        t.print(System.out);
+        
+        r3.delete();
+        
+        boolean fail = true;
+        
+        try {
+            r3.field(0, "Ditto");
+        } catch (Error e) {
+            fail = false;
+        } catch (NullPointerException npe) {
+            fail = false;
+        } finally {
+            if (fail) {
+                throw new Error("Deleted record still functional.");
+            }
         }
     }
 }

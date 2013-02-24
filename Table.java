@@ -129,7 +129,7 @@ public class Table {
         // Replace all single \ with double \\.
         ret = ret.replace("\\", "\\\\");
 
-        // Preceed all newlines and commas with a \.
+        // Precede all newlines and commas with a \.
         ret = ret.replace("\n", "\\\n");
         ret = ret.replace(",", "\\,");
 
@@ -189,7 +189,7 @@ public class Table {
         return null;
     }
 
-    public void insert(Record r) {
+    protected void insert(Record r) {
         // Do nothing if there's no header
         if (header == null) {
             return;
@@ -200,7 +200,7 @@ public class Table {
         }
     }
 
-    public void delete(Record r) {
+    protected void delete(Record r) {
         int row = find(r);
 
         if (row >= 0) {
