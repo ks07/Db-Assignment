@@ -25,9 +25,11 @@ public class Program {
     
     private void listInstructions() {
         p("Commands:");
-        p("help\tDisplay this command list");
-        p("exit\tExit the program");
-        p("tables\tList table names in the database\n");
+        p("help                                Display this command list");
+        p("exit                                Exit the program");
+        p("print <table>                       Display the specified table");
+        p("edit <table> <key> <column> <value> Change field in a table");
+        //p("store <table>                       Saves the specified table to disc\n");
     }
     
     public void run() {
@@ -44,10 +46,30 @@ public class Program {
             
             if (cmd.equalsIgnoreCase("help")) {
                 listInstructions();
-            } else if (cmd.equalsIgnoreCase("tables")) {
-                Table[] tables = db.tables();
-                for (Table t : tables) {
-                    p(t.name());
+            } else if (cmd.equalsIgnoreCase("print")) {
+                if (splitIn.length == 2) {
+                    Table t = db.table(splitIn[1]);
+                    
+                    if (t == null) {
+                        p("Table " + splitIn[1] + " does not exist.");
+                    } else {
+                        t.print(System.out);
+                    }
+                } else {
+                    p("Wrong number of arguments.");
+                }
+            } else if (cmd.equalsIgnoreCase("edit")) {
+                if (splitIn.length == 5) {
+                    Table t = db.table(splitIn[1]);
+                    Record r = t.select(splitIn[2]);
+                    
+                    try {
+                        r.field(t.column(splitIn[3]), splitIn[4]);
+                    } catch (Error e) {
+                        p("Unable to modify.");
+                    }
+                } else {
+                    p("Wrong number of arguments.");
                 }
             }
             

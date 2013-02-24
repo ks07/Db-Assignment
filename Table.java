@@ -91,6 +91,12 @@ public class Table {
 
         while (read >= 0) {
             c = (char)read;
+            
+            if (c == '\r') {
+                // Skip it
+                read = in.read();
+                c = (char)read;
+            }
 
             if (isEscaped) {
                 if (c == ',' || c == '\\' || c == '\n') {
