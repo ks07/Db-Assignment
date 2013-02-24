@@ -45,7 +45,10 @@ public class Program {
             if (cmd.equalsIgnoreCase("help")) {
                 listInstructions();
             } else if (cmd.equalsIgnoreCase("tables")) {
-                
+                Table[] tables = db.tables();
+                for (Table t : tables) {
+                    p(t.name());
+                }
             }
             
             p("Enter query:");
@@ -55,7 +58,6 @@ public class Program {
     
     public static void main(String[] args) {
         Program p = new Program();
-        
         p.run();
     }
 }
