@@ -109,7 +109,7 @@ public class Type {
             }
         }
 
-        throw new Error("Invalid type name.");
+        throw new Error("Invalid type name: " + name);
     }
 
     public String toString() {

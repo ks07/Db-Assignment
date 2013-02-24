@@ -20,6 +20,11 @@ public class Database {
     public Table table(String name) {
         return tables.get(name);
     }
+    
+    // Returns array of tables in the db
+    public Table[] tables() {
+        return (Table[])tables.values().toArray();
+    }
 
     // Internal method for use by table constructors
     void addTable(Table t) {
