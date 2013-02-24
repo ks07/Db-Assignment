@@ -90,6 +90,10 @@ public class Type {
         return ret;
     }
 
+    boolean rightAligned() {
+        return type == TYPE.INT;
+    }
+
     private static TYPE parseName(String name) {
         if ("string".equals(name)) {
             return TYPE.STR;

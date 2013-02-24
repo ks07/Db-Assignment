@@ -11,7 +11,7 @@ public class Record {
         // Determine number of columns to use and
         // insert if the table already has a header
         int cols;
-        if (table.columns() == 0) {
+        if (table.columns() == 0) { 
             cols = 1;
         } else {
             cols = table.columns();

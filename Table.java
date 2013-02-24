@@ -6,17 +6,33 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Table {
     private final String name;
     private final Record header;
+    private final Type[] types;
     private final ArrayList<Record> records;
     private final Database parent;
 
+    private static final Type[] defaultTypes(Database db, int cols) {
+        // Set type to default, String.
+        Type[] types = new Type[cols];
+        Type strType = Type.type(db, "string");
+        Arrays.fill(types, strType);
+
+        return types;
+    }
+
     public Table(Database db, String name, String[] columns) {
+        this(db, name, columns, defaultTypes(db, columns.length));
+    }
+
+    public Table(Database db, String name, String[] columns, Type[] types) {
         records = new ArrayList<Record>();
         this.name = name;
         header = new Record(this, columns);
+        this.types = types;
         parent = db;
         parent.addTable(this);
     }
@@ -35,6 +51,18 @@ public class Table {
                 header = new Record(this, line);
             } else {
                 throw new Error("Table file empty.");
+            }
+
+            line = readNext(in);
+            if (line != null && line.length == header.fields()) {
+                // Second line gives the column types.
+                types = new Type[header.fields()];
+                for (int i = 0; i < line.length; i++) {
+                    Type t = Type.type(db, line[i]);
+                    types[i] = t;
+                }
+            } else {
+                throw new Error("Types not present for columns.");
             }
 
             for (line = readNext(in); line != null; line = readNext(in)) {
@@ -201,10 +229,25 @@ public class Table {
         if (header == null) {
             return;
         } else if (find(r) < 0) {
-            records.add(r);
+            if (checkRecord(r)) {
+                records.add(r);
+            } else {
+                throw new Error("Field invalid for given type.");
+            }
         } else {
             throw new Error("Inserting duplicate record.");
         }
+    }
+
+    // Returns true if all the fields in the given record fit with the type.
+    private boolean checkRecord(Record r) {
+        for (int i = 0; i < r.fields(); i++) {
+            if (!types[i].allowed(r.field(i))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected void delete(Record r) {
