@@ -131,6 +131,7 @@ public class Table {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(this.name + ".txt"));
 
+            // Write the header.
             String s;
             for (int col = 0; col < header.fields() - 1; col++) {
                 s = header.field(col);
@@ -138,6 +139,16 @@ public class Table {
                 out.write(',');
             }
             s = header.field(header.fields() - 1);
+            out.write(escapeChars(s));
+            out.write('\n');
+
+            // Write the types.
+            for (int i = 0; i < types.length - 1; i++) {
+                s = types[i].toString();
+                out.write(escapeChars(s));
+                out.write(',');
+            }
+            s = types[types.length].toString();
             out.write(escapeChars(s));
             out.write('\n');
 

@@ -14,9 +14,11 @@ public class Type {
     private final TYPE type;
     private final HashSet<String> tags;
     private final Table ref;
+    private final String name;
 
     // Private constructor for internal use
-    private Type(TYPE type, String[] tags, Table ref) {
+    private Type(String name, TYPE type, String[] tags, Table ref) {
+        this.name = name;
         this.type = type;
 
         if (tags != null) {
@@ -60,13 +62,13 @@ public class Type {
             switch (parsed) {
             case STR:
             case INT:
-                ret = new Type(parsed, null, null);
+                ret = new Type(name, parsed, null, null);
                 break;
             case REF:
                 Table ref = db.table(name.substring(4, name.length() - 1));
 
                 if (ref != null) {
-                    ret = new Type(parsed, null, ref);
+                    ret = new Type(name, parsed, null, ref);
                 } else {
                     throw new Error("Type references non-existant table.");
                 }
@@ -77,7 +79,7 @@ public class Type {
 
                 if (m.matches()) {
                     String[] tags = inner.split(",");
-                    ret = new Type(parsed, tags, null);
+                    ret = new Type(name, parsed, tags, null);
                 } else {
                     throw new Error("Type tags are invalid.");
                 }
@@ -108,6 +110,10 @@ public class Type {
         }
 
         throw new Error("Invalid type name.");
+    }
+
+    public String toString() {
+        return this.name;
     }
 
     public static void main(String[] args) {
