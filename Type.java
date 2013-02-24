@@ -12,6 +12,7 @@ public class Type {
 
     // One or more strings not containing ',' separated with ,
     private static final Pattern TAGPAT = Pattern.compile("[^,]+(,[^,]+)*");
+    private static final Pattern INTPAT = Pattern.compile("-?[0-9]+");
 
     // Private constructor for internal use
     private Type(TYPE type, String[] tags, Table ref) {
@@ -21,7 +22,27 @@ public class Type {
     }
     
     public boolean allowed(String value) {
-        // TODO: Check if string is allowed for this type
+        switch (type) {
+        case STR:
+            return true;
+        case INT:
+            return INTPAT.matcher(value).matches();
+        case TAG:
+            return strArrayContains(tags, value);
+        case REF:
+            return ref.select(value) != null;
+        }
+
+        throw new Error("Could not check value against type.");
+    }
+
+    private static boolean strArrayContains(String[] arr, String val) {
+        for (String s : arr) {
+            if (s.equals(val)) {
+                return true;
+            }
+        }
+
         return false;
     }
     
@@ -91,6 +112,13 @@ public class Type {
 
         if (tag0 != tag1) {
             throw new Error("Did not retrieve tag from cache.");
+        }
+
+        if (!tag0.allowed("yes")) {
+            throw new Error("Tag allowed failed.");
+        }
+        if (tag0.allowed("maybe")) {
+            throw new Error("Invalid tag accepted.");
         }
     }
 
