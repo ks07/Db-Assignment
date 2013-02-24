@@ -148,7 +148,7 @@ public class Table {
                 out.write(escapeChars(s));
                 out.write(',');
             }
-            s = types[types.length].toString();
+            s = types[types.length - 1].toString();
             out.write(escapeChars(s));
             out.write('\n');
 

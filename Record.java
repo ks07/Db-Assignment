@@ -8,6 +8,9 @@ public class Record {
             throw new Error("Key already in use.");
         }
         
+        fields = new String[table.columns()];
+        fields[0] = key;
+
         // Determine number of columns to use and
         // insert if the table already has a header
         int cols;
@@ -17,9 +20,6 @@ public class Record {
             cols = table.columns();
             table.insert(this);
         }
-        
-        fields = new String[table.columns()];
-        fields[0] = key;
         
         // Fill with blank strings
         for (int i = 1; i < cols; i++) {
@@ -57,13 +57,14 @@ public class Record {
         int cols;
         if (table.columns() == 0) {
             cols = values.length;
+            fields = new String[cols];
         } else {
             cols = table.columns();
+            fields = new String[cols];
             table.insert(this);
         }
 
         // Copy the provided array so that it cannot be modified externally.
-        fields = new String[cols];
         System.arraycopy(values, 0, fields, 0, values.length);
         
         // Fill in the remainder with blanks
