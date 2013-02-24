@@ -143,7 +143,8 @@ public class Record {
             "epsilon"
         };
 
-        Table t = new Table("test", cols);
+        Database db = new Database();
+        Table t = new Table(db, "test", cols);
         Record r = new Record(t, values);
 
         if (r.checkBounds(-1)) {

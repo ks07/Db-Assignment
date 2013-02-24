@@ -11,13 +11,16 @@ public class Table {
     private final String name;
     private final Record header;
     private final ArrayList<Record> records;
+    private final Database parent;
 
-    public Table(String name, String[] columns) {
+    public Table(Database db, String name, String[] columns) {
         records = new ArrayList<Record>();
         this.name = name;
         header = new Record(this, columns);
+        parent = db;
+        parent.addTable(this);
     }
-    public Table(String name) {
+    public Table(Database db, String name) {
         records = new ArrayList<Record>();
         this.name = name;
 
@@ -43,6 +46,9 @@ public class Table {
         } catch (IOException ioe) {
             throw new Error("Could not read table file.", ioe);
         }
+        
+        parent = db;
+        parent.addTable(this);
     }
 
     // Reads the next record from the given BufferedReader as an array of Strings.
@@ -292,7 +298,8 @@ public class Table {
             "gamma"
         };
 
-        Table t = new Table("test", cols);
+        Database db = new Database();
+        Table t = new Table(db, "test", cols);
         new Record(t, new String[] {"a", "b", "c"});
         new Record(t, new String[] {"ab\ncd", "ef\\gh", "ij,kl"});
         new Record(t, new String[] {"1", "2", "3"});
@@ -305,7 +312,7 @@ public class Table {
         t.store();
 
         // Test loading of the file.
-        t = new Table("test");
+        t = new Table(db, "test");
 
         if (t.columns() != cols.length) {
             throw new Error("Columns incorrect.");
@@ -317,7 +324,7 @@ public class Table {
             throw new Error("Column name incorrect.");
         }
 
-        t = new Table("people");
+        t = new Table(db, "people");
         t.print(System.out);
     }
 }

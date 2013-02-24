@@ -6,11 +6,11 @@ by George Field (gf12815) & Alistair Wick (aw12700)
 
 Analysis
 ==========
-The program is used as a component of another to store and retrieve records in a single database table. Records added to a table are a collection of Strings. Empty strings are allowed, but the number of fields in a record must always match the number of columns. A table must contain at least one column.
+We are providing a number of components which can be used in other programs to store and retrieve records in a single database with one or more tables. Records added to a table are a collection of Strings. Empty strings are allowed, but the number of fields in a record must always match the number of columns. A table must contain at least one column, to act as the key.
 
 Design
 ==========
-The program can be split into two components, Table and Record. The Record class will simply wrap an array of Strings, and provide public methods to allow access to the data it contains. The table class will use an ArrayList to store a collection of these Record objects, as well as headers describing each field found in the records. Methods will be added to allow access to get the names of these columns, as well as methods that will allow adding and removing records from the table.
+The program can be split into several components: Table, Record, and Database. The Record class will simply wrap an array of Strings, and provide public methods to allow access to the data it contains. The table class will use an ArrayList to store a collection of these Record objects, as well as headers describing each field found in the records. Methods will be added to allow access to get the names of these columns, as well as methods that will allow adding and removing records from the table.
 
 Access to stored records will be index based, with the indexes generated sequentially as rows are inserted. Rows are deleted by passing the row object to be removed to the delete method. The Table will then search the list of records for the given object using reference equality, and once found will remove it's reference from the list.
 

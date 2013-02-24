@@ -13,7 +13,7 @@ public class Database {
             int end = tbl.getName().length() - 4;
             String name = tbl.getName().substring(0, end);
 
-            tables.put(name, new Table(name));
+            new Table(this, name);
         }
     }
 
@@ -21,7 +21,7 @@ public class Database {
         return tables.get(name);
     }
 
-    // Internal method to add a table created after construction.
+    // Internal method for use by table constructors
     protected void addTable(Table t) {
         tables.put(t.name(), t);
     }
@@ -35,5 +35,10 @@ public class Database {
 
     public static void main(String[] args) {
         Database db = new Database();
+        Table t = db.table("people");
+        
+        if (t == null) {
+            throw new Error("People table missing from database.");
+        }
     }
 }
