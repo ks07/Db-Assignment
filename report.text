@@ -38,7 +38,11 @@ We tested cases covering the following possibilities:
 * Null fields and records being provided.
 * Inserting the same record multiple times.
 * Saving and loading a table to a file containing characters that must be escaped.
+* Printing a file and checking the output is exact.
+* Normal operation of functions and the public api.
+
+As well as built-in unit testing, we have also built the Program class to help in testing. We have used the Program to test the public api methods, and it's interactive nature allows us to test almost all the features provided by the system. While this is no substitute for the automated tests, it allows us to perform some final testing before shipping our product without having to edit any code, which could introduce regressions.
 
 Deployment
 ==========
-The program should be included as part of another, larger program to act as a storage backend.
+The program should be included as part of another, larger program to act as a storage backend. We can provide the accompanying program to allow the developer of the new application to eaily check that their system is interacting with ours correctly. It could also act as a reference implementation.
