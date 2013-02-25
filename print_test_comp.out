@@ -1,0 +1,6 @@
+Key   | Username | Surname | Forenames      | Known As | Email                    | Int test
+------+----------+---------+----------------+----------+--------------------------+---------
+cx43  | ian      | lolz    | Ian James      | Ian      | Ian.Holyer@bristol.ac.uk | 1
+td183 | ted      | Bear    | Theodore Edwin | Ted      | ted@cs.bris.ac.uk        | 2
+lr12  | izza     | Bright  | Peter          | Pete     | pete34@my.bristol.ac.uk  | 3
+bb76  | John     | Smith   | John           | Johnny   | j@gmail.com              | -12345

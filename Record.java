@@ -201,7 +201,7 @@ public class Record {
         } catch (Error e) {
             fail = false;
         } catch (NullPointerException npe) {
-            fail = false;
+            fail = true;
         } finally {
             if (fail) {
                 throw new Error("Deleted record still functional.");

@@ -1,10 +1,16 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.security.DigestInputStream;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -394,6 +400,30 @@ public class Table {
         }
 
         t = new Table(db, "people");
-        t.print(System.out);
+
+        try {
+            FileOutputStream fos = new FileOutputStream(new File("print_test_out.out"));
+            MessageDigest outDigest = MessageDigest.getInstance("MD5");
+            DigestOutputStream outDigestStream = new DigestOutputStream(fos, outDigest);
+            PrintStream testOut = new PrintStream(outDigestStream);
+            t.print(testOut);
+            testOut.close();
+            FileInputStream fis = new FileInputStream(new File("print_test_comp.out"));
+            MessageDigest inDigest = MessageDigest.getInstance("MD5");
+            DigestInputStream inDigestStream = new DigestInputStream(fis, inDigest);
+
+            int r = inDigestStream.read();
+            while (r != -1) {
+                r = inDigestStream.read();
+            }
+
+            if (!Arrays.equals(outDigest.digest(), inDigest.digest())) {
+                throw new Error("Print output does not match expected output.");
+            }
+        } catch (IOException ioe) {
+            throw new Error("Print testing failed.", ioe);
+        } catch (NoSuchAlgorithmException nsa) {
+            throw new Error("Print test algorithm doesn't exist.");
+        }
     }
 }
