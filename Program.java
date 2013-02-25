@@ -41,7 +41,7 @@ public class Program {
         p("----------------------------------------------------------");
     }
     
-    public void run() {
+    private void run() {
         p("DATABASE PROGRAM: By George Field & Alistair Wick");
         p("==========================================================\n");
         showMainHelp();
@@ -106,7 +106,7 @@ public class Program {
         p("----------------------------------------------------------");
     }
     
-    public void editTable(Table t) {
+    private void editTable(Table t) {
         if (t == null) {
             p("No such table.");
             return;
@@ -130,48 +130,19 @@ public class Program {
                 t.print(System.out);
             } else if (cmd.equalsIgnoreCase("edit")) {
                 if (splitIn.length == 2) {
-                    Record r = t.select(splitIn[1]);
-                    
-                    if (r == null) {
-                        p("No such record.");
-                    } else {
-                        p("Enter name of column to change: ");
-                        String col = readln();
-                        p("Enter new value for field: ");
-                        String val = readln();
-                        
-                        try {
-                            r.field(t.column(col), val);
-                        } catch (Error e) {
-                            p("Unable to modify: " + e.getMessage());
-                        }
-                    }
+                    editRecord(t, t.select(splitIn[1]));
                 } else {
                     p("Wrong number of arguments.");
                 }
             } else if (cmd.equalsIgnoreCase("replace")) {
                 if (splitIn.length == 2) {
-                    Record r = t.select(splitIn[1]);
-                    
-                    if (r == null) {
-                        p("No such record.");
-                    } else {
-                        r.delete();
-                        addRecord(t, splitIn[1]);
-                    }
+                    replaceRecord(t, t.select(splitIn[1]));
                 } else {
                     p("Wrong number of arguments.");
                 }
             } else if (cmd.equalsIgnoreCase("delete")) {
                 if (splitIn.length == 2) {
-                    Record r = t.select(splitIn[1]);
-                    
-                    if (r == null) {
-                        p("No such record.");
-                    } else {
-                        r.delete();
-                        p("Successfully deleted record.");
-                    }
+                    deleteRecord(t.select(splitIn[1]));
                 } else {
                     p("Wrong number of arguments.");
                 }
@@ -188,7 +159,43 @@ public class Program {
         p("Finished editing table: " + t.name());
     }
     
-    public void addRecord(Table t, String key) {
+    private void editRecord(Table t, Record r) {
+        if (r == null) {
+            p("No such record.");
+        } else {
+            p("Enter name of column to change: ");
+            String col = readln();
+            p("Enter new value for field: ");
+            String val = readln();
+            
+            try {
+                r.field(t.column(col), val);
+            } catch (Error e) {
+                p("Unable to modify: " + e.getMessage());
+            }
+        }
+    }
+    
+    private void replaceRecord(Table t, Record r) {
+        if (r == null) {
+            p("No such record.");
+        } else {
+            String key = r.key();
+            r.delete();
+            addRecord(t, key);
+        }
+    }
+    
+    private void deleteRecord(Record r) {
+        if (r == null) {
+            p("No such record.");
+        } else {
+            r.delete();
+            p("Successfully deleted record.");
+        }
+    }
+    
+    private void addRecord(Table t, String key) {
         Record r;
         
         // Ensure a valid key is used
