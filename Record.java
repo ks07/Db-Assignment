@@ -4,7 +4,7 @@ public class Record {
 
     public Record(Table table, String key) {
         parent = table;
-        
+
         // Check the key isn't in use
         if (parent.select(key) != null) {
             throw new Error("Key already in use.");
@@ -13,15 +13,15 @@ public class Record {
         // Determine number of columns to use and
         // insert if the table already has a header
         int cols;
-        if (parent.columns() == 0) { 
+        if (parent.columns() == 0) {
             cols = 1;
         } else {
             cols = parent.columns();
         }
-        
+
         fields = new String[cols];
         field(0, key);
-        
+
         // Fill with blank strings
         for (int i = 1; i < cols; i++) {
             field(i, "");
@@ -32,7 +32,7 @@ public class Record {
 
     public Record(Table table, String[] values) {
         parent = table;
-        
+
         // Check that the array is valid
         if (values == null) {
             throw new Error("Attempted to store a null value.");
@@ -44,17 +44,17 @@ public class Record {
                 throw new Error("Attempted to store a null value.");
             }
         }
-        
+
         // Check the key isn't in use
         if (parent.select(values[0]) != null) {
             throw new Error("Key already in use.");
         }
-        
+
         // Check the array fits into table
         if (parent.columns() != 0 && values.length > parent.columns()) {
             throw new Error("Record length exceeds table size.");
         }
-        
+
         // Determine number of columns to use and
         // insert if the table already has a header
         int cols;
@@ -63,17 +63,17 @@ public class Record {
         } else {
             cols = parent.columns();
         }
-        
+
         fields = new String[cols];
 
         // Copy the provided array so that it cannot be modified externally.
         System.arraycopy(values, 0, fields, 0, values.length);
-        
+
         // Fill in the remainder with blanks
         for (int i = values.length; i < cols; i++) {
             field(i, "");
         }
-        
+
         parent.insert(this);
     }
 
@@ -95,13 +95,13 @@ public class Record {
                 if (col == 0 && parent.select(value) != null) {
                     throw new Error("Key already in use.");
                 }
-                
+
                 Type type = parent.type(col);
-                
+
                 if (!type.allowed(value)) {
                     throw new Error("Value not of type " + type.toString());
                 }
-                
+
                 fields[col] = value;
             } else {
                 throw new Error("Attempted to store a null value.");
@@ -114,7 +114,7 @@ public class Record {
     public int fields() {
         return fields.length;
     }
-    
+
     public String key() {
         if (fields.length > 0) {
             return fields[0];
@@ -122,12 +122,12 @@ public class Record {
             throw new Error("Bad column.");
         }
     }
-    
+
     public void delete() {
         if (fields == null) {
             throw new Error("Record has already been deleted.");
         }
-        
+
         if (parent.select(key()) != null) {
             fields = null;
             parent.delete(this);
@@ -171,37 +171,33 @@ public class Record {
         if (!"apple".equals(r.field(0))) {
             throw new Error("Field set failed.");
         }
-        
-        t.print(System.out);
-        
+
         if (!t.select("apple").equals(r)) {
             throw new Error("Record not in table.");
         }
-        
+
         r.delete();
         if (t.select("apple") != null) {
             throw new Error("Deleted record still in table.");
         }
-        
+
         Record r1 = new Record(t, values);
         r1.field(0, "apple");
         Record r2 = new Record(t, values);
         r2.field(0, "endothermic");
         Record r3 = new Record(t, values);
         r3.field(0, "To Kill a Mockingbird");
-        
-        t.print(System.out);
-        
+
         r3.delete();
-        
+
         boolean fail = true;
-        
+
         try {
             r3.field(0, "Ditto");
         } catch (Error e) {
             fail = false;
         } catch (NullPointerException npe) {
-            fail = true;
+            fail = false;
         } finally {
             if (fail) {
                 throw new Error("Deleted record still functional.");
