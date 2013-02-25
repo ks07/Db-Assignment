@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Database {
@@ -19,6 +20,12 @@ public class Database {
 
     public Table table(String name) {
         return tables.get(name);
+    }
+    
+    public Table[] tables() {
+        Table[] result = new Table[0];
+        Collection<Table> c = tables.values();
+        return c.toArray(result);
     }
 
     // Internal method for use by table constructors

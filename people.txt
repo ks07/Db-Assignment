@@ -1,4 +1,6 @@
 Key,Username,Surname,Forenames,Known As,Email
 string,string,string,string,string,string
-cx43,ian,Holyer,Ian James,Ian,Ian.Holyer@bristol.ac.uk
-td183,ted,Bear,Ted,Ted,ted@cs.bris.ac.uk
+cx43,ian,lolz,Ian James,Ian,Ian.Holyer@bristol.ac.uk
+td183,ted,Bear,Theodore Edwin,Ted,ted@cs.bris.ac.uk
+lr12,izza,Bright,Peter,Pete,pete34@my.bristol.ac.uk
+yolo,YOLO,YOLO,YOLO,YOLO,kkkkkkkkkkkk
