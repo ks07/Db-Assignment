@@ -340,7 +340,9 @@ public class Table {
         if (types[col].toString().equals("integer")) {
             printMult(out, ' ', len - val.length() - 1);
             out.print(val);
-            out.print(" ");
+            if (col != (header.fields() - 1)) {
+                out.print(" ");
+            }
         } else {
             out.print(val);
             printMult(out, ' ', len - val.length());
