@@ -221,6 +221,14 @@ public class Table {
 
         return -1;
     }
+    
+    public Type type(int col) {
+        if (checkColBounds(col)) {
+            return types[col];
+        } else {
+            throw new Error("Bad column.");
+        }
+    }
 
     public Record select(int row) {
         if (checkRowBounds(row)) {

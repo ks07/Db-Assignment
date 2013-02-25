@@ -143,7 +143,7 @@ public class Program {
                         try {
                             r.field(t.column(col), val);
                         } catch (Error e) {
-                            p("Unable to modify.");
+                            p("Unable to modify: " + e.getMessage());
                         }
                     }
                 } else {

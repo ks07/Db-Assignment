@@ -38,6 +38,17 @@ public class Type {
     }
 
     public boolean allowed(String value) {
+        // Can never be a null value
+        if (value == null) {
+            throw new Error("Attempted to check null value.");
+        }
+        
+        // Always allow blank
+        if (value == "") {
+            return true;
+        }
+        
+        // Otherwise test
         switch (type) {
         case STR:
             return true;

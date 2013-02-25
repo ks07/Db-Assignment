@@ -3,33 +3,36 @@ public class Record {
     private final Table parent;
 
     public Record(Table table, String key) {
+        parent = table;
+        
         // Check the key isn't in use
-        if (table.select(key) != null) {
+        if (parent.select(key) != null) {
             throw new Error("Key already in use.");
         }
-        
-        fields = new String[table.columns()];
-        fields[0] = key;
 
         // Determine number of columns to use and
         // insert if the table already has a header
         int cols;
-        if (table.columns() == 0) { 
+        if (parent.columns() == 0) { 
             cols = 1;
         } else {
-            cols = table.columns();
-            table.insert(this);
+            cols = parent.columns();
         }
+        
+        fields = new String[cols];
+        field(0, key);
         
         // Fill with blank strings
         for (int i = 1; i < cols; i++) {
-            fields[i] = "";
+            field(i, "");
         }
-        
-        parent = table;
+
+        parent.insert(this);
     }
 
     public Record(Table table, String[] values) {
+        parent = table;
+        
         // Check that the array is valid
         if (values == null) {
             throw new Error("Attempted to store a null value.");
@@ -43,36 +46,35 @@ public class Record {
         }
         
         // Check the key isn't in use
-        if (table.select(values[0]) != null) {
+        if (parent.select(values[0]) != null) {
             throw new Error("Key already in use.");
         }
         
         // Check the array fits into table
-        if (table.columns() != 0 && values.length > table.columns()) {
+        if (parent.columns() != 0 && values.length > parent.columns()) {
             throw new Error("Record length exceeds table size.");
         }
         
         // Determine number of columns to use and
         // insert if the table already has a header
         int cols;
-        if (table.columns() == 0) {
+        if (parent.columns() == 0) {
             cols = values.length;
-            fields = new String[cols];
         } else {
-            cols = table.columns();
-            fields = new String[cols];
-            table.insert(this);
+            cols = parent.columns();
         }
+        
+        fields = new String[cols];
 
         // Copy the provided array so that it cannot be modified externally.
         System.arraycopy(values, 0, fields, 0, values.length);
         
         // Fill in the remainder with blanks
         for (int i = values.length; i < cols; i++) {
-            fields[i] = "";
+            field(i, "");
         }
         
-        parent = table;
+        parent.insert(this);
     }
 
     private boolean checkBounds(int col) {
@@ -92,9 +94,15 @@ public class Record {
             if (value != null) {
                 if (col == 0 && parent.select(value) != null) {
                     throw new Error("Key already in use.");
-                } else {
-                    fields[col] = value;
                 }
+                
+                Type type = parent.type(col);
+                
+                if (!type.allowed(value)) {
+                    throw new Error("Value not of type " + type.toString());
+                }
+                
+                fields[col] = value;
             } else {
                 throw new Error("Attempted to store a null value.");
             }
