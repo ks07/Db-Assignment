@@ -91,7 +91,7 @@ public class Program {
                     p("Wrong number of arguments.");
                 }
             } else {
-                p("No such command. Type\"help\" for command list.");
+                p("No such command. Type \"help\" for command list.");
             }
         }
         
@@ -103,7 +103,6 @@ public class Program {
         p("Table edit commands:");
         p("    help          - Display this command list");
         p("    done          - Stop editing and save changes to disc");
-        p("    cancel        - Stop editing and discard changes");
         p("    print         - Display the open table");
         p("    edit <key>    - Modify record at <key>");
         p("    replace <key> - Replace record at <key>");
@@ -157,7 +156,7 @@ public class Program {
                     addRecord(t, splitIn[1]);
                 }
             } else {
-                p("No such command. Type\"help\" for command list.");
+                p("No such command. Type \"help\" for command list.");
             }
         }
         
