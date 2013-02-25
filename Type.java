@@ -165,11 +165,9 @@ public class Type {
 
     private static class TypeKey {
         private final Database db;
-        private final TYPE type;
         private final String name;
 
         public TypeKey(Database db, TYPE type, String name) {
-            this.type = type;
             this.name = name;
 
             // Db is only relevant if this is a ref type.
