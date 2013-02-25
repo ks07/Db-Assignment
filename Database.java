@@ -21,7 +21,7 @@ public class Database {
     public Table table(String name) {
         return tables.get(name);
     }
-    
+
     public Table[] tables() {
         Table[] result = new Table[0];
         Collection<Table> c = tables.values();
@@ -43,7 +43,7 @@ public class Database {
     public static void main(String[] args) {
         Database db = new Database();
         Table t = db.table("people");
-        
+
         if (t == null) {
             throw new Error("People table missing from database.");
         }

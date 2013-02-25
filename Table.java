@@ -81,7 +81,7 @@ public class Table {
         } catch (IOException ioe) {
             throw new Error("Could not read table file.", ioe);
         }
-        
+
         parent = db;
         parent.addTable(this);
     }
@@ -97,7 +97,7 @@ public class Table {
 
         while (read >= 0) {
             c = (char)read;
-            
+
             if (c == '\r') {
                 // Skip it
                 read = in.read();
@@ -191,7 +191,7 @@ public class Table {
         ret = ret.replace("\n", "\\\n");
         ret = ret.replace(",", "\\,");
 
-        return ret; 
+        return ret;
     }
 
     public String name() {
@@ -227,7 +227,7 @@ public class Table {
 
         return -1;
     }
-    
+
     public Type type(int col) {
         if (checkColBounds(col)) {
             return types[col];
@@ -243,7 +243,7 @@ public class Table {
             throw new Error("Bad row.");
         }
     }
-    
+
     public Record select(String key) {
         for (int i = 0; i < records.size(); i++) {
             Record r = records.get(i);
@@ -251,7 +251,7 @@ public class Table {
                 return r;
             }
         }
-        
+
         return null;
     }
 
@@ -345,7 +345,7 @@ public class Table {
             out.print(val);
             printMult(out, ' ', len - val.length());
         }
-        
+
         if (col != columns()-1) {
             out.print("| ");
         } else {
@@ -393,7 +393,7 @@ public class Table {
         new Record(t, new String[] {"a", "b", "c"});
         new Record(t, new String[] {"ab\ncd", "ef\\gh", "ij,kl"});
         new Record(t, new String[] {"1", "2", "3"});
-        
+
         if (!"2".equals(t.select("1").field(1))) {
             throw new Error("Key incorrect");
         }
