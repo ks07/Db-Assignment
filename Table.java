@@ -307,7 +307,10 @@ public class Table {
         int[] widths = getColWidths();
 
         for (int col = 0; col < widths.length - 1; col++) {
-            padPrint(out, header.field(col), widths[col]);
+            String val = header.field(col);
+            out.print(val);
+            printMult(out, ' ', widths[col] - val.length());
+            out.print("| ");
         }
         out.println(header.field(widths.length - 1));
 
@@ -320,16 +323,28 @@ public class Table {
 
         for (Record r : records) {
             for (int col = 0; col < widths.length - 1; col++) {
-                padPrint(out, r.field(col), widths[col]);
+                padPrint(out, r.field(col), col, widths[col]);
             }
-            out.println(r.field(widths.length - 1));
+            int col = widths.length - 1;
+            padPrint(out, r.field(col), col, widths[col]);
         }
     }
 
-    private void padPrint(PrintStream out, String val, int len) {
-        out.print(val);
-        printMult(out, ' ', len - val.length());
-        out.print("| ");
+    private void padPrint(PrintStream out, String val, int col, int len) {
+        if (types[col].toString().equals("integer")) {
+            printMult(out, ' ', len - val.length() - 1);
+            out.print(val);
+            out.print(" ");
+        } else {
+            out.print(val);
+            printMult(out, ' ', len - val.length());
+        }
+        
+        if (col != columns()-1) {
+            out.print("| ");
+        } else {
+            out.print("\n");
+        }
     }
 
     private void printMult(PrintStream out, char c, int len) {

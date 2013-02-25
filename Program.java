@@ -4,12 +4,18 @@ import java.io.InputStreamReader;
 
 public class Program {
     private BufferedReader reader;
-    private final Database db;
+    private Database db;
     
     public Program() {
         InputStreamReader isr = new InputStreamReader(System.in);
         reader = new BufferedReader(isr);
-        db = new Database();
+        
+        try {
+            db = new Database();
+        } catch (Error e) {
+            p("Unable to open Database: " + e.getMessage());
+            System.exit(1);
+        }
     }
     
     // Print a line
@@ -163,13 +169,15 @@ public class Program {
         if (r == null) {
             p("No such record.");
         } else {
-            p("Enter name of column to change: ");
+            query("Enter name of column to change: ");
             String col = readln();
-            p("Enter new value for field: ");
+            query("Enter new value for field: ");
             String val = readln();
             
             try {
+                String orig = r.field(t.column(col));
                 r.field(t.column(col), val);
+                p("Changed \"" + orig + "\" to \"" + val + "\".");
             } catch (Error e) {
                 p("Unable to modify: " + e.getMessage());
             }
@@ -211,7 +219,7 @@ public class Program {
             // Loop to ensure correct type entry
             boolean success = false;
             while (!success) {
-                p("Enter value for \"" + t.name(i) + "\":");
+                query("Enter value for \"" + t.name(i) + "\": ");
                 String val = readln();
                 
                 try {
