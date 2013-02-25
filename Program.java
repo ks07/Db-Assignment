@@ -162,6 +162,19 @@ public class Program {
                 } else {
                     p("Wrong number of arguments.");
                 }
+            } else if (cmd.equalsIgnoreCase("delete")) {
+                if (splitIn.length == 2) {
+                    Record r = t.select(splitIn[1]);
+                    
+                    if (r == null) {
+                        p("No such record.");
+                    } else {
+                        r.delete();
+                        p("Successfully deleted record.");
+                    }
+                } else {
+                    p("Wrong number of arguments.");
+                }
             } else if (cmd.equalsIgnoreCase("add")) {
                 if (splitIn.length == 2) {
                     addRecord(t, splitIn[1]);
