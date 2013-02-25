@@ -23,21 +23,23 @@ public class Program {
         }
     }
     
-    private void listInstructions() {
+    private void showMainHelp() {
+        p("----------------------------------------------------------");
         p("Commands:");
-        p("help                                Display this command list");
-        p("exit                                Exit the program");
-        p("print <table>                       Display the specified table");
-        p("edit <table> <key> <column> <value> Change field in a table");
-        //p("store <table>                       Saves the specified table to disc\n");
+        p("    help            - Display this command list");
+        p("    exit            - Exit the program");
+        p("    print <table>   - Display the specified table");
+        p("    edit <table>    - Open the specified table for editing");
+        p("----------------------------------------------------------\n");
     }
     
     public void run() {
         // Create the database
         db = new Database();
         
-        p("Database program\n================\n");
-        listInstructions();
+        p("DATABASE PROGRAM: By George Field & Alistair Wick");
+        p("==========================================================\n");
+        showMainHelp();
         
         String in = "";
         while (!in.equalsIgnoreCase("exit")) {
@@ -45,7 +47,7 @@ public class Program {
             String cmd = splitIn[0];
             
             if (cmd.equalsIgnoreCase("help")) {
-                listInstructions();
+                showMainHelp();
             } else if (cmd.equalsIgnoreCase("print")) {
                 if (splitIn.length == 2) {
                     Table t = db.table(splitIn[1]);
@@ -59,15 +61,9 @@ public class Program {
                     p("Wrong number of arguments.");
                 }
             } else if (cmd.equalsIgnoreCase("edit")) {
-                if (splitIn.length == 5) {
+                if (splitIn.length == 2) {
                     Table t = db.table(splitIn[1]);
-                    Record r = t.select(splitIn[2]);
-                    
-                    try {
-                        r.field(t.column(splitIn[3]), splitIn[4]);
-                    } catch (Error e) {
-                        p("Unable to modify.");
-                    }
+                    editTable(t);
                 } else {
                     p("Wrong number of arguments.");
                 }
@@ -76,6 +72,60 @@ public class Program {
             p("Enter query:");
             in = readln();
         }
+        
+        p("Goodbye.");
+    }
+    
+    private void showTableHelp() {
+        p("----------------------------------------------------------");
+        p("Table edit commands:");
+        p("    help         - Display this command list");
+        p("    done         - Stop editing and save changes to disc");
+        p("    cancel       - Stop editing and discard changes");
+        p("    print        - Display the open table");
+        p("    edit <key>   - Modify record at <key>");
+        //p("    add <key>    - Add a new record with key <key>");
+        //p("    delete <key> - Delete record at <key>");
+        p("----------------------------------------------------------\n");
+    }
+    
+    public void editTable(Table t) {
+        showTableHelp();
+        
+        String in = "";
+        while (!in.equalsIgnoreCase("done")) {
+            String[] splitIn = in.split(" ");
+            String cmd = splitIn[0];
+            
+            if (cmd.equalsIgnoreCase("help")) {
+                showTableHelp();
+            } else if (cmd.equalsIgnoreCase("print")) {
+                t.print(System.out);
+            } else if (cmd.equalsIgnoreCase("edit")) {
+                if (splitIn.length == 2) {
+                    Record r = t.select(splitIn[1]);
+                    
+                    p("Enter name of column to change: ");
+                    String col = readln();
+                    p("Enter new value for field: ");
+                    String val = readln();
+                    
+                    try {
+                        r.field(t.column(col), val);
+                    } catch (Error e) {
+                        p("Unable to modify.");
+                    }
+                } else {
+                    p("Wrong number of arguments.");
+                }
+            }
+            
+            p("Editing " + t.name() + ":");
+            in = readln();
+        }
+        
+        t.store();
+        p("Finished editing table: " + t.name() + "\n");
     }
     
     public static void main(String[] args) {
